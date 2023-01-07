@@ -1,8 +1,29 @@
 version: '3.4'
 
+networks:
+  backend:
+
 services:
+  basedb:
+    container_name: base-db
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=dY^9E3&DaC
+    networks:
+      - backend
+    ports:
+      - 1533:1433
+
   configurationbag.endpoint.api:
     image: ${DOCKER_REGISTRY-}configurationbagendpointapi
     build:
       context: .
-      dockerfile: src/ConfigurationBag.Endpoint.Api/Dockerfile
+      dockerfile: src/ConfigurationBag.EndPoint.Api/Dockerfile
+    networks:
+      - backend
+    ports:
+      - 800:80
+
+
+

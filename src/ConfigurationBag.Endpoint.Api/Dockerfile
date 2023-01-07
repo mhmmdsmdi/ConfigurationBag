@@ -3,14 +3,13 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["src/ConfigurationBag.Endpoint.Api/ConfigurationBag.EndPoint.Api.csproj", "src/ConfigurationBag.Endpoint.Api/"]
-RUN dotnet restore "src/ConfigurationBag.Endpoint.Api/ConfigurationBag.EndPoint.Api.csproj"
+COPY ["src/ConfigurationBag.EndPoint.Api/ConfigurationBag.EndPoint.Api.csproj", "src/ConfigurationBag.EndPoint.Api/"]
+RUN dotnet restore "src/ConfigurationBag.EndPoint.Api/ConfigurationBag.EndPoint.Api.csproj"
 COPY . .
-WORKDIR "/src/src/ConfigurationBag.Endpoint.Api"
+WORKDIR "/src/src/ConfigurationBag.EndPoint.Api"
 RUN dotnet build "ConfigurationBag.EndPoint.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
