@@ -1,6 +1,12 @@
-﻿namespace ConfigurationBag.Core.Common.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ConfigurationBag.Core.Common.Entities;
 
 public class Entity
 {
-    public int Id { get; set; }
+    protected Entity()
+    { }
+
+    [Key]
+    public long Id { get; set; }
 }

@@ -5,7 +5,7 @@ networks:
 
 services:
   basedb:
-    container_name: base-db
+    container_name: main-database
     image: mcr.microsoft.com/mssql/server:latest
     environment:
       - ACCEPT_EULA=Y
@@ -16,6 +16,7 @@ services:
       - 1533:1433
 
   configurationbag.endpoint.api:
+    container_name: configuration-bag
     image: ${DOCKER_REGISTRY-}configurationbagendpointapi
     build:
       context: .
@@ -23,7 +24,12 @@ services:
     networks:
       - backend
     ports:
-      - 800:80
+      - 800:80    
+    environment:
+      - DB_HOST=main-database
+      - DB_NAME=ConfigurationBag
+      - DB_USER=SA
+      - DB_PASSWORD=dY^9E3&DaC
 
 
 
