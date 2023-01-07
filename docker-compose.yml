@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  configurationbag.endpoint.api:
+    image: ${DOCKER_REGISTRY-}configurationbagendpointapi
+    build:
+      context: .
+      dockerfile: src/ConfigurationBag.Endpoint.Api/Dockerfile
