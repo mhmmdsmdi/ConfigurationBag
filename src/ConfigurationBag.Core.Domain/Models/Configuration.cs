@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ConfigurationBag.Core.Common.Dto;
 using ConfigurationBag.Core.Common.Entities;
 using FluentValidation;
 
@@ -17,9 +18,25 @@ public class Configuration : Entity
     public virtual ICollection<Property> Properties { get; set; }
 }
 
-public class ConfigurationValidator : AbstractValidator<Configuration>
+public class ConfigurationInsertDto : BaseDto<ConfigurationInsertDto, Configuration>
 {
-    public ConfigurationValidator()
+    public string Name { get; set; }
+
+    public string Key { get; set; }
+}
+
+public class ConfigurationSelectDto : BaseDto<ConfigurationSelectDto, Configuration>
+{
+    public long Id { get; set; }
+
+    public string Name { get; set; }
+
+    public string Key { get; set; }
+}
+
+public class ConfigurationInsertValidator : AbstractValidator<ConfigurationInsertDto>
+{
+    public ConfigurationInsertValidator()
     {
         RuleFor(x => x.Key).NotEmpty();
         RuleFor(x => x.Key).MaximumLength(256);
