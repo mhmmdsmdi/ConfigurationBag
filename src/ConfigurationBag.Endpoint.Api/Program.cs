@@ -10,6 +10,9 @@ using ConfigurationBag.Core.Domain.Models;
 using ConfigurationBag.EndPoint.Api.Extensions;
 using ConfigurationBag.Infrastructure.Data.SqlServer;
 using ConfigurationBag.Infrastructure.Data.SqlServer.Extensions;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -24,34 +27,61 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(contain
             commonAssembly, domainAssembly, serviceAssembly, repositoryAssembly);
     }));
 
-/* Configure Services */
+var levelSwitch = new LoggingLevelSwitch
+{
+    MinimumLevel = LogEventLevel.Information
+};
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.Seq(DotNetEnv.Env.GetString("SEQ_URL"),
+        apiKey: DotNetEnv.Env.GetString("SEQ_API_KEY"),
+        controlLevelSwitch: levelSwitch)
+    .MinimumLevel.ControlledBy(levelSwitch)
+    .CreateLogger();
+Serilog.Debugging.SelfLog.Enable(Console.Error);
 
-/* Base Database */
-var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-var dbUser = Environment.GetEnvironmentVariable("DB_USER");
-var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-builder.Services.AddApplicationDbContext(dbHost, dbName, dbUser, dbPassword);
+try
+{
+    /* Configure Services */
 
-//builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-//builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
-builder.Services.InitializeAutoMapper(typeof(Configuration).Assembly);
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers();
+    builder.Host.UseSerilog();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddApiSwagger();
+    /* Base Database */
+    var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+    var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+    builder.Services.AddApplicationDbContext(dbHost, dbName, dbUser, dbPassword);
 
-var app = builder.Build();
+    builder.Services.InitializeAutoMapper(typeof(Configuration).Assembly);
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddControllers();
 
-/* Configure the HTTP request pipeline. */
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddApiSwagger();
 
-app.UseExceptionHandlingMiddleware();
+    var app = builder.Build();
 
-app.UseApiSwagger();
+    /* Configure the HTTP request pipeline. */
 
-app.UseAuthorization();
+    app.UseSerilogRequestLogging();
 
-app.MapControllers();
+    app.UseExceptionHandlingMiddleware();
 
-app.Run();
+    app.UseApiSwagger();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

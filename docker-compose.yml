@@ -15,6 +15,17 @@ services:
     ports:
       - 1533:1433
 
+  seq:
+    container_name: seq-log-manager
+    image: datalust/seq:latest
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - backend    
+    ports:
+      - 5341:5341
+      - 5340:80
+
   configurationbag.endpoint.api:
     container_name: configuration-bag
     image: ${DOCKER_REGISTRY-}configurationbagendpointapi
@@ -30,6 +41,8 @@ services:
       - DB_NAME=ConfigurationBag
       - DB_USER=SA
       - DB_PASSWORD=dY^9E3&DaC
+      - SEQ_URL=http://seq:5341
+      - SEQ_API_KEY=iFmSvnjnngyWk88CRpsB
 
 
 
