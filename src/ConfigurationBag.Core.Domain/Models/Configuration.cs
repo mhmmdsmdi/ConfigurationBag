@@ -8,7 +8,7 @@ namespace ConfigurationBag.Core.Domain.Models;
 
 public class Configuration : Entity
 {
-    public long ApplicationId { get; set; }
+    public long CollectionId { get; set; }
 
     [Required]
     [StringLength(256)]
@@ -18,15 +18,15 @@ public class Configuration : Entity
     [StringLength(256)]
     public string Name { get; set; }
 
-    [ForeignKey(nameof(ApplicationId))]
-    public virtual App App { get; set; }
+    [ForeignKey(nameof(CollectionId))]
+    public virtual Collection Collection { get; set; }
 
     public virtual ICollection<Property> Properties { get; set; }
 }
 
 public class ConfigurationInsertDto : BaseDto<ConfigurationInsertDto, Configuration>
 {
-    public long ApplicationId { get; set; }
+    public long CollectionId { get; set; }
 
     public string Name { get; set; }
 
@@ -35,7 +35,7 @@ public class ConfigurationInsertDto : BaseDto<ConfigurationInsertDto, Configurat
 
 public class ConfigurationSelectDto : BaseDtoWithIdentity<ConfigurationSelectDto, Configuration>
 {
-    public long ApplicationId { get; set; }
+    public long CollectionId { get; set; }
 
     public string Name { get; set; }
 
@@ -46,6 +46,8 @@ public class ConfigurationInsertValidator : AbstractValidator<ConfigurationInser
 {
     public ConfigurationInsertValidator()
     {
+        RuleFor(x => x.CollectionId).NotEmpty();
+
         RuleFor(x => x.Key).NotEmpty();
         RuleFor(x => x.Key).MaximumLength(256);
 

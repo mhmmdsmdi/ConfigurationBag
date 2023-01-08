@@ -4,7 +4,7 @@ using ConfigurationBag.Core.Common.Entities;
 
 namespace ConfigurationBag.Core.Domain.Models;
 
-public class App : Entity
+public class Collection : Entity
 {
     [Required]
     [StringLength(256)]
@@ -13,12 +13,12 @@ public class App : Entity
     public virtual ICollection<Configuration> Configurations { get; set; }
 }
 
-public class AppInsertDto : BaseDto<AppInsertDto, App>
+public class CollectionInsertDto : BaseDto<CollectionInsertDto, Collection>
 {
     public string Name { get; set; }
 }
 
-public class AppSelectDto : BaseDtoWithIdentity<AppSelectDto, App>
+public class CollectionSelectDto : BaseDtoWithIdentity<CollectionSelectDto, Collection>
 {
     public string Name { get; set; }
 }
