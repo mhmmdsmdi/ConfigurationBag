@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+using AutoMapper;
 using ConfigurationBag.Core.Common.Entities;
 using ConfigurationBag.Core.Common.Mapping;
 
@@ -58,4 +60,12 @@ public abstract class BaseDto<TDto, TEntity> : ICustomMapping
     public virtual void CustomMappings(IMappingExpression<TEntity, TDto> mapping)
     {
     }
+}
+
+
+public abstract class BaseDtoWithIdentity<TDto, TEntity> : BaseDto<TDto, TEntity>
+    where TDto : class, new()
+    where TEntity : Entity, new()
+{
+    public long Id { get; set; }
 }

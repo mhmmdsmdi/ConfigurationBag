@@ -22,6 +22,24 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.App", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Applications");
+                });
+
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Configuration", b =>
                 {
                     b.Property<long>("Id")
@@ -29,6 +47,9 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ApplicationId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Key")
                         .IsRequired()
@@ -41,6 +62,8 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
 
                     b.ToTable("Configurations");
                 });
@@ -92,6 +115,17 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                     b.ToTable("Values");
                 });
 
+            modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Configuration", b =>
+                {
+                    b.HasOne("ConfigurationBag.Core.Domain.Models.App", "App")
+                        .WithMany("Configurations")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("App");
+                });
+
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Property", b =>
                 {
                     b.HasOne("ConfigurationBag.Core.Domain.Models.Configuration", "Configuration")
@@ -112,6 +146,11 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Property");
+                });
+
+            modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.App", b =>
+                {
+                    b.Navigation("Configurations");
                 });
 
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Configuration", b =>

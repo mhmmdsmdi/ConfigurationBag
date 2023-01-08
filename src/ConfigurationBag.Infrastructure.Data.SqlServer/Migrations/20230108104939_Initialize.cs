@@ -12,17 +12,37 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Applications",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Applications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Configurations",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationId = table.Column<long>(type: "bigint", nullable: false),
                     Key = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Configurations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Configurations_Applications_ApplicationId",
+                        column: x => x.ApplicationId,
+                        principalTable: "Applications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,6 +87,11 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Configurations_ApplicationId",
+                table: "Configurations",
+                column: "ApplicationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Properties_ConfigurationId",
                 table: "Properties",
                 column: "ConfigurationId");
@@ -88,6 +113,9 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Configurations");
+
+            migrationBuilder.DropTable(
+                name: "Applications");
         }
     }
 }

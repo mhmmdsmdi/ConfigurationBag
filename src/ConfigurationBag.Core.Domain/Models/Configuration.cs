@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ConfigurationBag.Core.Common.Dto;
 using ConfigurationBag.Core.Common.Entities;
 using FluentValidation;
@@ -7,6 +8,8 @@ namespace ConfigurationBag.Core.Domain.Models;
 
 public class Configuration : Entity
 {
+    public long ApplicationId { get; set; }
+
     [Required]
     [StringLength(256)]
     public string Key { get; set; }
@@ -14,20 +17,25 @@ public class Configuration : Entity
     [Required]
     [StringLength(256)]
     public string Name { get; set; }
+
+    [ForeignKey(nameof(ApplicationId))]
+    public virtual App App { get; set; }
 
     public virtual ICollection<Property> Properties { get; set; }
 }
 
 public class ConfigurationInsertDto : BaseDto<ConfigurationInsertDto, Configuration>
 {
+    public long ApplicationId { get; set; }
+
     public string Name { get; set; }
 
     public string Key { get; set; }
 }
 
-public class ConfigurationSelectDto : BaseDto<ConfigurationSelectDto, Configuration>
+public class ConfigurationSelectDto : BaseDtoWithIdentity<ConfigurationSelectDto, Configuration>
 {
-    public long Id { get; set; }
+    public long ApplicationId { get; set; }
 
     public string Name { get; set; }
 

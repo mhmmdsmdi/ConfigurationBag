@@ -1,5 +1,6 @@
 ﻿using ConfigurationBag.Core.Common.Entities;
 using ConfigurationBag.Core.Common.Repositories;
+using ConfigurationBag.Infrastructure.Data.SqlServer.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConfigurationBag.Infrastructure.Data.SqlServer;
@@ -7,12 +8,12 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer;
 public class Repository<TEntity> : IRepository<TEntity>
     where TEntity : Entity
 {
-    public DbContext DbContext { get; }
+    public ApplicationDbContext DbContext { get; }
     public DbSet<TEntity> Entities { get; }
     public virtual IQueryable<TEntity> Table => Entities;
     public virtual IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
 
-    public Repository(DbContext dbContext)
+    public Repository(ApplicationDbContext dbContext)
     {
         DbContext = dbContext;
 

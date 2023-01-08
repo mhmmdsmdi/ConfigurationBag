@@ -8,6 +8,7 @@ public class ApplicationDbContext : DbContext
 {
     private readonly string _connectionString = "";
 
+    public virtual DbSet<App> Applications { get; set; } = null!;
     public virtual DbSet<Configuration> Configurations { get; set; } = null!;
     public virtual DbSet<Property> Properties { get; set; } = null!;
     public virtual DbSet<Value> Values { get; set; } = null!;

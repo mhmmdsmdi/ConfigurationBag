@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using ConfigurationBag.Core.Common.Repositories;
+using ConfigurationBag.Core.Common.Services;
 using ConfigurationBag.Core.Domain.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ConfigurationBag.Core.ApplicationService.Configurations;
 
-public interface IConfigurationService
+public interface IConfigurationService : IService
 {
     Task<ConfigurationSelectDto> InsertAsync(ConfigurationInsertDto configuration, CancellationToken cancellationToken);
 }
