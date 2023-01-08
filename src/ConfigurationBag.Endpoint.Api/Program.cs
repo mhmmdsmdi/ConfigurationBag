@@ -10,6 +10,8 @@ using ConfigurationBag.Core.Domain.Models;
 using ConfigurationBag.EndPoint.Api.Extensions;
 using ConfigurationBag.Infrastructure.Data.SqlServer;
 using ConfigurationBag.Infrastructure.Data.SqlServer.Extensions;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -58,8 +60,13 @@ try
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddControllers();
 
+    builder.Services.AddValidatorsFromAssemblyContaining<ConfigurationInsertValidator>();
+    builder.Services.AddFluentValidationAutoValidation();
+
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddApiSwagger();
+
+    builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
     var app = builder.Build();
 

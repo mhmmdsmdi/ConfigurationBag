@@ -2,6 +2,7 @@
 
 public static class Messages
 {
+    public const string BadRequest = "Request is bad.";
     public const string UnknownError = "Unknown error.";
     public const string Success = "Operation done successfully.";
     public const string CreatedSuccess = "Create successfully.";

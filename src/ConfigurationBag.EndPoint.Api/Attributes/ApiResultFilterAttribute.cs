@@ -53,6 +53,7 @@ public class ApiResultFilterAttribute : ActionFilterAttribute
             var apiResult = new ApiResult<string>
             {
                 Succeeded = false,
+                Message = Messages.BadRequest,
                 Errors = messages
             };
 

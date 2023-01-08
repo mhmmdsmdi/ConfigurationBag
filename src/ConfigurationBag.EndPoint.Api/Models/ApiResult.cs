@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using ConfigurationBag.Core.Common.Consts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConfigurationBag.EndPoint.Api.Models;
@@ -65,6 +66,7 @@ public class ApiResult<TData> : ApiResult
         return new ApiResult<TData>
         {
             Succeeded = false,
+            Message = Core.Common.Consts.Messages.BadRequest,
             Errors = errorMessages
         };
     }
@@ -115,7 +117,7 @@ public class ApiResult
 
     public string Message { get; set; }
 
-    public List<string> Errors;
+    public List<string> Errors { get; set; }
 
     protected ApiResult()
     {
@@ -143,7 +145,12 @@ public class ApiResult
         var errorMessages = new List<string>();
         if (result.Value is SerializableError errors)
             errorMessages = errors.SelectMany(p => (string[])p.Value).Distinct().ToList();
-        return new ApiResult { Errors = errorMessages };
+        return new ApiResult
+        {
+            Succeeded = false,
+            Message = Messages.BadRequest,
+            Errors = errorMessages
+        };
     }
 
     public static implicit operator ApiResult(UnauthorizedResult result)
