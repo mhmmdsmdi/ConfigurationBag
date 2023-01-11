@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ConfigurationBag.Core.Common.Dto;
 using ConfigurationBag.Core.Common.Entities;
 using FluentValidation;
 
@@ -11,7 +12,10 @@ public class Property : Entity
 
     [Required]
     [StringLength(256)]
-    public string Name { get; set; }
+    public string Key { get; set; }
+
+    [StringLength(256)]
+    public string Description { get; set; }
 
     [ForeignKey(nameof(ConfigurationId))]
     public virtual Configuration Configuration { get; set; }
@@ -19,11 +23,33 @@ public class Property : Entity
     public virtual ICollection<Value> Values { get; set; }
 }
 
-public class PropertyValidator : AbstractValidator<Property>
+public class PropertyInsertDto : BaseDto<PropertyInsertDto, Property>
 {
-    public PropertyValidator()
+    public long CollectionId { get; set; }
+
+    public string Description { get; set; }
+
+    public string Key { get; set; }
+}
+
+public class PropertySelectDto : BaseDtoWithIdentity<PropertySelectDto, Property>
+{
+    public long CollectionId { get; set; }
+
+    public string Description { get; set; }
+
+    public string Key { get; set; }
+}
+
+public class PropertyInsertValidator : AbstractValidator<PropertyInsertDto>
+{
+    public PropertyInsertValidator()
     {
-        RuleFor(x => x.Name).NotEmpty();
-        RuleFor(x => x.Name).MaximumLength(256);
+        RuleFor(x => x.CollectionId).NotEmpty();
+
+        RuleFor(x => x.Key).NotEmpty();
+        RuleFor(x => x.Key).MaximumLength(256);
+
+        RuleFor(x => x.Description).MaximumLength(256);
     }
 }

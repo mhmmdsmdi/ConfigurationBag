@@ -1,4 +1,5 @@
 ﻿using ConfigurationBag.Core.Domain.Models;
+using ConfigurationBag.Infrastructure.Data.SqlServer.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -13,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public virtual DbSet<Configuration> Configurations { get; set; } = null!;
     public virtual DbSet<Property> Properties { get; set; } = null!;
     public virtual DbSet<Value> Values { get; set; } = null!;
+    public virtual DbSet<Label> Labels { get; set; } = null!;
 
     public ApplicationDbContext()
     {
@@ -33,8 +35,18 @@ public class ApplicationDbContext : DbContext
 
         if (!optionsBuilder.IsConfigured && !string.IsNullOrWhiteSpace(_connectionString))
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseSqlServer(_connectionString, x => x.MigrationsHistoryTable("ApplicationDbContextHistory", Schemas.Base));
         }
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        var configurationsAssembly = typeof(ApplicationDbContext).Assembly;
+
+        modelBuilder.RegisterEntityTypeConfiguration(configurationsAssembly);
+        modelBuilder.AddPluralizingTableNameConvention();
     }
 }
 

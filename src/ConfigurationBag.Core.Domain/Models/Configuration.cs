@@ -14,9 +14,8 @@ public class Configuration : Entity
     [StringLength(256)]
     public string Key { get; set; }
 
-    [Required]
     [StringLength(256)]
-    public string Name { get; set; }
+    public string Description { get; set; }
 
     [ForeignKey(nameof(CollectionId))]
     public virtual Collection Collection { get; set; }
@@ -28,7 +27,7 @@ public class ConfigurationInsertDto : BaseDto<ConfigurationInsertDto, Configurat
 {
     public long CollectionId { get; set; }
 
-    public string Name { get; set; }
+    public string Description { get; set; }
 
     public string Key { get; set; }
 }
@@ -37,7 +36,7 @@ public class ConfigurationSelectDto : BaseDtoWithIdentity<ConfigurationSelectDto
 {
     public long CollectionId { get; set; }
 
-    public string Name { get; set; }
+    public string Description { get; set; }
 
     public string Key { get; set; }
 }
@@ -51,7 +50,6 @@ public class ConfigurationInsertValidator : AbstractValidator<ConfigurationInser
         RuleFor(x => x.Key).NotEmpty();
         RuleFor(x => x.Key).MaximumLength(256);
 
-        RuleFor(x => x.Name).NotEmpty();
-        RuleFor(x => x.Name).MaximumLength(256);
+        RuleFor(x => x.Description).MaximumLength(256);
     }
 }

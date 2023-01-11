@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230108195348_Initialize")]
+    [Migration("20230111191726_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -40,7 +40,7 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collections");
+                    b.ToTable("Collections", "Base");
                 });
 
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Configuration", b =>
@@ -54,12 +54,11 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                     b.Property<long>("CollectionId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Key")
-                        .IsRequired()
+                    b.Property<string>("Description")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -68,7 +67,55 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 
                     b.HasIndex("CollectionId");
 
-                    b.ToTable("Configurations");
+                    b.ToTable("Configurations", "Base");
+                });
+
+            modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.FeatureFlag", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CollectionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsEnable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollectionId");
+
+                    b.ToTable("FeatureFlags", "Base");
+                });
+
+            modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Label", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Labels", "Base");
                 });
 
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Property", b =>
@@ -82,7 +129,11 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                     b.Property<long>("ConfigurationId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Description")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -91,7 +142,7 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 
                     b.HasIndex("ConfigurationId");
 
-                    b.ToTable("Properties");
+                    b.ToTable("Properties", "Base");
                 });
 
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Value", b =>
@@ -115,13 +166,54 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("Values");
+                    b.ToTable("Values", "Base");
+                });
+
+            modelBuilder.Entity("FeatureFlagLabel", b =>
+                {
+                    b.Property<long>("FeatureFlagsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("LabelsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("FeatureFlagsId", "LabelsId");
+
+                    b.HasIndex("LabelsId");
+
+                    b.ToTable("FeatureFlagLabels", "Base");
+                });
+
+            modelBuilder.Entity("LabelValue", b =>
+                {
+                    b.Property<long>("LabelsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ValuesId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("LabelsId", "ValuesId");
+
+                    b.HasIndex("ValuesId");
+
+                    b.ToTable("ValueLabels", "Base");
                 });
 
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Configuration", b =>
                 {
                     b.HasOne("ConfigurationBag.Core.Domain.Models.Collection", "Collection")
                         .WithMany("Configurations")
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Collection");
+                });
+
+            modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.FeatureFlag", b =>
+                {
+                    b.HasOne("ConfigurationBag.Core.Domain.Models.Collection", "Collection")
+                        .WithMany("FeatureFlags")
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -151,9 +243,41 @@ namespace ConfigurationBag.Infrastructure.Data.SqlServer.Migrations
                     b.Navigation("Property");
                 });
 
+            modelBuilder.Entity("FeatureFlagLabel", b =>
+                {
+                    b.HasOne("ConfigurationBag.Core.Domain.Models.FeatureFlag", null)
+                        .WithMany()
+                        .HasForeignKey("FeatureFlagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConfigurationBag.Core.Domain.Models.Label", null)
+                        .WithMany()
+                        .HasForeignKey("LabelsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LabelValue", b =>
+                {
+                    b.HasOne("ConfigurationBag.Core.Domain.Models.Label", null)
+                        .WithMany()
+                        .HasForeignKey("LabelsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConfigurationBag.Core.Domain.Models.Value", null)
+                        .WithMany()
+                        .HasForeignKey("ValuesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Collection", b =>
                 {
                     b.Navigation("Configurations");
+
+                    b.Navigation("FeatureFlags");
                 });
 
             modelBuilder.Entity("ConfigurationBag.Core.Domain.Models.Configuration", b =>

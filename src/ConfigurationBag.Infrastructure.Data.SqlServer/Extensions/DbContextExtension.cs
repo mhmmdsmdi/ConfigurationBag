@@ -41,7 +41,7 @@ public static class DbContextExtension
 
         services.AddDbContext<ApplicationDbContext>(opt =>
         {
-            opt.UseSqlServer(connectionString);
+            opt.UseSqlServer(connectionString, x => x.MigrationsHistoryTable("ApplicationDbContextHistory", Schemas.Base));
             opt.EnableSensitiveDataLogging();
         });
     }
